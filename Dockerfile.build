@@ -1,0 +1,30 @@
+FROM gcc:14 AS builder
+
+ARG CMAKE_VERSION=3.28.3
+ARG NINJA_VERSION=1.12.1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    wget \
+    unzip \
+    git \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget -q "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz" \
+    -O /tmp/cmake.tar.gz \
+    && tar -xzf /tmp/cmake.tar.gz -C /opt \
+    && ln -s /opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/* /usr/local/bin/ \
+    && rm /tmp/cmake.tar.gz
+
+RUN wget -q "https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/ninja-linux.zip" \
+    -O /tmp/ninja.zip \
+    && unzip -q /tmp/ninja.zip -d /usr/local/bin \
+    && rm /tmp/ninja.zip
+
+RUN useradd -m -s /bin/bash builder
+USER builder
+WORKDIR /home/builder
+
+CMD ["/bin/bash"]

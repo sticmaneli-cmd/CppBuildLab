@@ -1,0 +1,44 @@
+project:
+  name: "CppBuildLab"
+  language: "cpp"
+  standard: 20
+
+build:
+  image: "gcc:14"
+  generator: "Ninja"
+  tools:
+    - "gcc"
+    - "cmake"
+    - "ninja"
+    - "git"
+  cmake_options:
+    - "-DCMAKE_BUILD_TYPE=Release"
+    - "-DBUILD_TESTS=ON"
+
+dependencies:
+  googletest:
+    method: "FetchContent"
+    version: "release-1.14.0"
+  sdl3:
+    method: "system"
+    version: "3.2.0"
+    optional: true
+
+tests:
+  enabled: true
+  command: "ctest --output-on-failure --parallel 4"
+
+publish:
+  enabled: true
+  branch: "main"
+  require_tests: true
+  artifact_patterns:
+    - "calculator_app"
+    - "*.xml"
+  server:
+    url_env: "ARTIFACT_SERVER_URL"
+    token_env: "ARTIFACT_SERVER_TOKEN"
+
+output:
+  directory: "build"
+  artifacts_dir: "artifacts"
